@@ -7,16 +7,18 @@ namespace Address_book
     class Program
     {
         public static Dictionary<string, AddressBook> MapAddressBook = new Dictionary<string, AddressBook>();
+        public static Dictionary<string, List<Contact>> ContactsCityWise = new Dictionary<string, List<Contact>>();
+        public static Dictionary<string, List<Contact>> ContactsStateWise = new Dictionary<string, List<Contact>>();
 
         static void Main(string[] args)
         {
-            Console.WriteLine("===Welcome to Addresh book using console Apllicaation by Akshay Raut ===");
+            Console.WriteLine("===Welcome to Addresh book using console Apllicaation by Akshay Raut===");
 
             int optisn;
             string name;
             do
             {
-                Console.WriteLine("\nOptions : \n 1.Add New Address Book \n 2.Work On Existing Address Book \n 3.Exit");
+                Console.WriteLine("\nOptions : \n 1.Add New Address Book \n 2.Work On Existing Address Book \n 3.Search Contact BY State and City \n 4.Exit");
                 optisn = Convert.ToInt32(Console.ReadLine());
                 switch (optisn)
                 {
@@ -32,13 +34,29 @@ namespace Address_book
                         FillAddressBook(addressBook);
                         break;
                     case 3:
+                        Console.WriteLine("\tChose One Option\n1.Search By City \n\t OR\n2.Search By State");
+                        int input = Convert.ToInt32(Console.ReadLine());
+                        if (input == 1)
+                        {
+                            Console.WriteLine("Enter the city Name");
+                            string city = Console.ReadLine();
+                            GetingContactByCity(city).ForEach(contact => Console.WriteLine(contact));
+                        }
+                        else
+                        {
+                            Console.WriteLine("Enter the state Name");
+                            string state = Console.ReadLine();
+                            GetingContactByState(state).ForEach(contact => Console.WriteLine(contact));
+                        }
+                        break;
+                    case 4:
                         Console.WriteLine("====Thankyou!!! Have A Nice Day(*_*)===== ");
                         break;
                     default:
                         Console.WriteLine("sorry worng input");
                         break;
                 }
-            } while (optisn != 3);
+            } while (optisn != 4);
 
 
 
@@ -114,12 +132,21 @@ namespace Address_book
                             Console.WriteLine("Thankyou!! Contact Deleted Successfully");
                         }
                         break;
+
                     default:
                         Console.WriteLine("sorry wrong input(*.*) \n");
                         break;
 
                 }
             } while (options != 0);
+        }
+        public static List<Contact> GetingContactByCity(string City)
+        {
+            return ContactsCityWise[City];
+        }
+        public static List<Contact> GetingContactByState(string State)
+        {
+            return ContactsStateWise[State];
         }
 
     }
