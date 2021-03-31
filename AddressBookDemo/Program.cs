@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UC11_AddressBook
+namespace AddressBook
 {
     class Program
     {
