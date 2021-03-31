@@ -1,30 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace AddressBookMultipleAddress
+namespace UC11_AddressBook
 {
     class AddressBook : IContacts
     {
-        private Dictionary<string, contacts> addressBook = new Dictionary<string, contacts>();
+        private Dictionary<string, Contact> addressBook = new Dictionary<string, Contact>();
         private Dictionary<string, AddressBook> addressBookDictionary = new Dictionary<string, AddressBook>();
+        private Dictionary<Contact, string> cityDictionary = new Dictionary<Contact, string>();
+        private Dictionary<Contact, string> stateDictionary = new Dictionary<Contact, string>();
         public void AddContact(string firstName, string lastName, string address, string city, string state, string email, int zip, long phoneNumber, string bookName)
         {
-            contacts contact = new contacts();
-            contact.FirstName = firstName;
-            contact.LastName = lastName;
-            contact.Address = address;
-            contact.City = city;
-            contact.State = state;
-            contact.Email = email;
-            contact.Zip = zip;
-            contact.PhoneNumber = phoneNumber;
-            addressBookDictionary[bookName].addressBook.Add(contact.FirstName, contact);
+            Contact contact = new Contact(firstName, lastName, address, city, state, email, zip, phoneNumber);
+            addressBookDictionary[bookName].addressBook.Add(contact.FirstName + " " + contact.LastName, contact);
             Console.WriteLine("\nAdded Succesfully. \n");
         }
         public void ViewContact(string name, string bookName)
         {
-            foreach (KeyValuePair<string, contacts> item in addressBookDictionary[bookName].addressBook)
+            foreach (KeyValuePair<string, Contact> item in addressBookDictionary[bookName].addressBook)
             {
                 if (item.Key.Equals(name))
                 {
@@ -41,7 +36,7 @@ namespace AddressBookMultipleAddress
         }
         public void ViewContact(string bookName)
         {
-            foreach (KeyValuePair<string, contacts> item in addressBookDictionary[bookName].addressBook)
+            foreach (KeyValuePair<string, Contact> item in addressBookDictionary[bookName].addressBook)
             {
                 Console.WriteLine("First Name : " + item.Value.FirstName);
                 Console.WriteLine("Last Name : " + item.Value.LastName);
@@ -55,7 +50,7 @@ namespace AddressBookMultipleAddress
         }
         public void EditContact(string name, string bookName)
         {
-            foreach (KeyValuePair<string, contacts> item in addressBookDictionary[bookName].addressBook)
+            foreach (KeyValuePair<string, Contact> item in addressBookDictionary[bookName].addressBook)
             {
                 if (item.Key.Equals(name))
                 {
@@ -122,10 +117,123 @@ namespace AddressBookMultipleAddress
         {
             return addressBookDictionary;
         }
-    }
+        public List<Contact> GetListOfDictctionaryValues(string bookName)
+        {
+            List<Contact> book = new List<Contact>();
+            foreach (var value in addressBookDictionary[bookName].addressBook.Values)
+            {
+                book.Add(value);
+            }
+            return book;
+        }
+        public List<Contact> GetListOfDictctionaryKeys(Dictionary<Contact, string> d)
+        {
+            List<Contact> book = new List<Contact>();
+            foreach (var value in d.Keys)
+            {
+                book.Add(value);
+            }
+            return book;
+        }
+        public bool CheckDuplicateEntry(Contact c, string bookName)
+        {
+            List<Contact> book = GetListOfDictctionaryValues(bookName);
+            if (book.Any(b => b.Equals(c)))
+            {
+                Console.WriteLine("Name already Exists.");
+                return true;
+            }
+            return false;
+        }
+        public void SearchPersonByCity(string city)
+        {
+            foreach (AddressBook addressbookobj in addressBookDictionary.Values)
+            {
+                CreateCityDictionary();
+                List<Contact> contactList = GetListOfDictctionaryKeys(addressbookobj.cityDictionary);
+                foreach (Contact contact in contactList.FindAll(c => c.City.Equals(city)).ToList())
+                {
+                    Console.WriteLine(contact.ToString());
+                }
+            }
+        }
+        public void SearchPersonByState(string state)
+        {
+            foreach (AddressBook addressbookobj in addressBookDictionary.Values)
+            {
+                CreateStateDictionary();
+                List<Contact> contactList = GetListOfDictctionaryKeys(addressbookobj.stateDictionary);
+                foreach (Contact contact in contactList.FindAll(c => c.State.Equals(state)).ToList())
+                {
+                    Console.WriteLine(contact.ToString());
+                }
+            }
+        }
+        public void CreateCityDictionary()
+        {
+            foreach (AddressBook addressBookObj in addressBookDictionary.Values)
+            {
+                foreach (Contact contact in addressBookObj.addressBook.Values)
+                {
+                    addressBookObj.cityDictionary.TryAdd(contact, contact.City);
+                }
+            }
+        }
+        public void CreateStateDictionary()
+        {
+            foreach (AddressBook addressBookObj in addressBookDictionary.Values)
+            {
+                foreach (Contact contact in addressBookObj.addressBook.Values)
+                {
+                    addressBookObj.stateDictionary.TryAdd(contact, contact.State);
+                }
+            }
+        }
+        public void DisplayCountByCityandState()
+        {
+            CreateCityDictionary();
+            CreateStateDictionary();
+            Dictionary<string, int> countByCity = new Dictionary<string, int>();
+            Dictionary<string, int> countByState = new Dictionary<string, int>();
+            foreach (var obj in addressBookDictionary.Values)
+            {
+                foreach (var person in obj.cityDictionary)
+                {
+                    countByCity.TryAdd(person.Value, 0);
+                    countByCity[person.Value]++;
+                }
+            }
+            Console.WriteLine("City wise count :");
+            foreach (var person in countByCity)
+            {
+                Console.WriteLine(person.Key + ":" + person.Value);
+            }
+            foreach (var obj in addressBookDictionary.Values)
+            {
+                foreach (var person in obj.stateDictionary)
+                {
+                    countByState.TryAdd(person.Value, 0);
+                    countByState[person.Value]++;
+                }
+            }
+            Console.WriteLine("State wise count :");
+            foreach (var person in countByState)
+            {
+                Console.WriteLine(person.Key + ":" + person.Value);
+            }
+        }
+        public void SortByName()
+        {
+            foreach (AddressBook addressBookobj in addressBookDictionary.Values)
+            {
+                List<string> list = addressBookobj.addressBook.Keys.ToList();
+                list.Sort();
+                foreach (string name in list)
+                {
+                    Console.WriteLine(addressBookobj.addressBook[name].ToString());
+                }
+            }
+        }
 
-    internal interface IContacts
-    {
     }
 }
-
