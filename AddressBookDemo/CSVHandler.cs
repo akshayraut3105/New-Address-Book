@@ -6,12 +6,27 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace AddressBook
+namespace AdressBook
 {
-    public class CSVHandler : CSVHandlerBase
+    public class CSVHandler
     {
-        private string filePath = @"C:\Users\ITeS\Desktop\NEW ADDRESSBOOK\New-Address-Book\AddressBookDemo\CSVHandler.cs";
-
+        private string filePath = @"C:\Users\MansiAtey\Desktop\JSON\UC15-ReadWriteToJSONfile\UC15-ReadWriteToJSONfile\Utility\AddressBookCSV.csv";
+        public void WriteToFile(Dictionary<string, AddressBook> addressBookDictionary)
+        {
+            using (StreamWriter writer = new StreamWriter(filePath))
+            {
+                using (CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    foreach (AddressBook obj in addressBookDictionary.Values)
+                    {
+                        List<Contact> contactRecord = obj.addressBook.Values.ToList();
+                        csv.WriteRecords(contactRecord);
+                    }
+                    Console.WriteLine("\nSuccessfully added to CSV file.");
+                    csv.Dispose();
+                }
+            }
+        }
         public void ReadFromFile()
         {
             using (StreamReader reader = new StreamReader(filePath))
@@ -26,7 +41,6 @@ namespace AddressBook
                     }
                 }
             }
-
         }
     }
 }
